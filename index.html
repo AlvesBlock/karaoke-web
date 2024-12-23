@@ -1,6 +1,7 @@
 <html><head><base href=".">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>Karaoke Star</title>
   <style>
       * {
@@ -1336,24 +1337,25 @@
   function generateVotingQRCode() {
     const votingId = generateVotingId();
     currentVotingId = votingId;
-    
+
     votes[votingId] = {
-      votes: [],
-      timestamp: Date.now()
+        votes: [],
+        timestamp: Date.now()
     };
     saveVotesToStorage();
-  
-    const votingUrl = `https://karaoke-cruz.netlify.app/vote.html?id=${votingId}`;
+
+    const votingUrl = `${window.location.origin}/votacao.html?id=${votingId}`;
     const qrContainer = document.getElementById('qrCode');
-    
+
     qrContainer.innerHTML = '';
-    
+
     new QRCode(qrContainer, {
-      text: votingUrl,
-      width: 128,
-      height: 128
+        text: votingUrl,
+        width: 128,
+        height: 128
     });
-  }
+}
+
   
   function calculateFinalScore(votingId) {
     if (!votes[votingId] || votes[votingId].votes.length === 0) {
