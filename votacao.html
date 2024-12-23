@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Votação - Karaoke Star</title>
-     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
- <style>
+    <style>
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(45deg, #2c3e50, #34495e);
@@ -57,8 +58,8 @@
         }
 
         .rating label:hover,
-        .rating label:hover ~ label,
-        .rating input:checked ~ label {
+        .rating label:hover~label,
+        .rating input:checked~label {
             color: #f39c12;
         }
 
@@ -76,6 +77,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Vote nos Cantores</h1>
@@ -95,7 +97,10 @@
         });
 
         function loadSingerList() {
+            const savedVotes = JSON.parse(localStorage.getItem('karaoke_votes')) || {};
             const savedQueue = JSON.parse(localStorage.getItem('singerQueue')) || [];
+            const currentVotes = savedVotes[votingId]?.votes || {};
+
             const singerList = document.getElementById('singerList');
             singerList.innerHTML = '';
 
@@ -105,24 +110,25 @@
                     const singerItem = document.createElement('div');
                     singerItem.className = 'singer-item';
                     singerItem.innerHTML = `
-                        <div>
-                            <strong>${singer.name}</strong><br>
-                            <small>${singer.status}</small>
-                        </div>
-                        <div class="rating">
-                            ${[5, 4, 3, 2, 1]
-                                .map(
-                                    value => `
-                                    <input type="radio" id="star-${index}-${value}" name="rating-${index}" value="${value}" onclick="vote('${singer.name}', ${value})">
-                                    <label for="star-${index}-${value}">&#9733;</label>
-                                `
-                                )
-                                .join('')}
-                        </div>
-                    `;
+                <div>
+                    <strong>${singer.name}</strong><br>
+                    <small>${singer.status}</small>
+                </div>
+                <div class="rating">
+                    ${[5, 4, 3, 2, 1]
+                            .map(
+                                value => `
+                            <input type="radio" id="star-${index}-${value}" name="rating-${index}" value="${value}" ${currentVotes[singer.name] === value ? 'checked' : ''} onclick="vote('${singer.name}', ${value})">
+                            <label for="star-${index}-${value}">&#9733;</label>
+                        `
+                            )
+                            .join('')}
+                </div>
+            `;
                     singerList.appendChild(singerItem);
                 });
         }
+
 
         function vote(singerName, rating) {
             votes[singerName] = rating;
@@ -134,12 +140,14 @@
                 ...storedVotes[votingId],
                 votes: {
                     ...storedVotes[votingId]?.votes,
-                    ...votes
-                }
+                    ...votes,
+                },
             };
             localStorage.setItem('karaoke_votes', JSON.stringify(storedVotes));
             alert('Votos enviados com sucesso!');
         }
+
     </script>
 </body>
+
 </html>

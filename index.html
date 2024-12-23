@@ -1,785 +1,796 @@
-<html><head><base href=".">
+<html>
+
+<head>
+  <base href=".">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <title>Karaoke Star</title>
   <style>
-      * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      }
-  
-      body {
-          background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
-          color: white;
-          min-height: 100vh;
-      }
-  
-      .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 20px;
-      }
-  
-      .welcome-screen {
-          text-align: center;
-          padding: 40px;
-          background: rgba(255,255,255,0.1);
-          border-radius: 15px;
-          margin: 50px auto;
-          max-width: 600px;
-      }
-  
-      .welcome-screen input {
-          width: 100%;
-          padding: 15px;
-          margin: 20px 0;
-          border: none;
-          border-radius: 8px;
-          background: rgba(255,255,255,0.2);
-          color: white;
-          font-size: 18px;
-      }
-  
-      .header {
-          text-align: center;
-          padding: 20px;
-          margin-bottom: 30px;
-          background: linear-gradient(45deg, #ff4081, #7c4dff);
-          border-radius: 10px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      }
-  
-      .header h2 {
-          margin-top: 10px;
-          font-size: 1.5em;
-          color: #fff;
-          text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      }
-  
-      .main-content {
-          display: grid;
-          grid-template-columns: 1fr 300px; 
-          gap: 20px;
-          margin-top: 20px;
-      }
-  
-      .song-list {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: 20px;
-      }
-  
-      .queue-list {
-          background: rgba(255,255,255,0.1);
-          padding: 20px;
-          border-radius: 10px;
-          height: fit-content;
-      }
-  
-      .queue-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: rgba(255,255,255,0.05);
-          padding: 15px;
-          margin: 10px 0;
-          border-radius: 5px;
-      }
-  
-      .song-card {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 10px;
-          background: rgba(255,255,255,0.1);
-          padding: 20px;
-          border-radius: 10px;
-          cursor: pointer;
-          transition: transform 0.3s;
-      }
-  
-      .song-card:hover {
-          transform: translateY(-5px);
-          background: rgba(255,255,255,0.15);
-      }
-  
-      .song-card img {
-          border-radius: 5px;
-      }
-  
-      .player-container {
-          grid-column: 1 / -1; 
-          order: -1; 
-          margin-bottom: 20px;
-          background: rgba(0,0,0,0.5);
-          padding: 20px;
-          border-radius: 10px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-      }
-  
-      .player-container h2 {
-          color: #fff;
-          margin-bottom: 15px;
-          text-align: center;
-          font-size: 1.8em;
-      }
-  
-      #youtubePlayer {
-          width: 100%;
-          margin-bottom: 20px;
-          border-radius: 10px;
-          overflow: hidden;
-      }
-  
-      .controls {
-          display: flex;
-          justify-content: center;
-          gap: 20px;
-          margin: 20px 0;
-      }
-  
-      button {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 5px;
-          background: #ff4081;
-          color: white;
-          cursor: pointer;
-          transition: background 0.3s;
-      }
-  
-      button:hover {
-          background: #7c4dff;
-      }
-  
-      .score-display {
-          text-align: center;
-          font-size: 24px;
-          margin: 20px 0;
-      }
-  
-      .queue-status {
-          padding: 5px 10px;
-          border-radius: 15px;
-          font-size: 0.8em;
-          font-weight: bold;
-      }
-  
-      .status-waiting {
-          background: #ffd700;
-          color: black;
-      }
-  
-      .status-playing {
-          background: #00ff00;
-          color: black;
-      }
-  
-      .status-finished {
-          background: #ff4081;
-          color: white;
-      }
-  
-      .queue-score {
-          font-weight: bold;
-          color: #7c4dff;
-      }
-  
-      .final-score-screen {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-size: cover;
-          background-position: center;
-          background-blend-mode: overlay;
-          display: none;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          z-index: 1000;
-      }
-  
-      .final-score-content {
-          background: rgba(0,0,0,0.8);
-          padding: 40px;
-          border-radius: 15px;
-          animation: scorePopup 0.5s ease-out;
-      }
-  
-      @keyframes scorePopup {
-          0% { transform: scale(0); }
-          100% { transform: scale(1); }
-      }
-  
-      .ranking-screen {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0,0,0,0.9);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 1000;
-      }
-  
-      .ranking-content {
-          background: rgba(255,255,255,0.1);
-          padding: 40px;
-          border-radius: 15px;
-          text-align: center;
-      }
-  
-      .rankings-list {
-          margin: 20px 0;
-      }
-  
-      .ranking-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 10px;
-          margin: 5px 0;
-          background: rgba(255,255,255,0.05);
-          border-radius: 5px;
-      }
-  
-      .position {
-          font-weight: bold;
-          color: #ff4081;
-      }
-  
-      .edit-btn, .delete-btn {
-          padding: 5px 10px;
-          margin-left: 5px;
-          font-size: 0.8em;
-      }
-  
-      .delete-btn {
-          background: #ff4081;
-      }
-  
-      .edit-btn {
-          background: #7c4dff;
-      }
-  
-      .singer-input {
-          display: flex;
-          gap: 10px;
-          margin: 20px 0;
-      }
-  
-      .singer-list {
-          margin: 20px 0;
-          max-height: 300px;
-          overflow-y: auto;
-      }
-  
-      .singer-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: rgba(255,255,255,0.1);
-          padding: 10px;
-          margin: 5px 0;
-          border-radius: 5px;
-      }
-  
-      .singer-item button {
-          padding: 5px 10px;
-          font-size: 0.8em;
-          background: #ff4081;
-      }
-      
-      .song-selection-modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0,0,0,0.9);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 1000;
-      }
-      
-      .song-selection-content {
-          background: rgba(255,255,255,0.1);
-          padding: 20px;
-          border-radius: 10px;
-          max-width: 800px;
-          max-height: 80vh;
-          overflow-y: auto;
-      }
-  
-      .song-selection-modal .song-list {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-          gap: 15px;
-          margin: 20px 0;
-      }
-  
-      .song-selection-modal .song-card {
-          cursor: pointer;
-          transition: transform 0.2s;
-      }
-  
-      .song-selection-modal .song-card:hover {
-          transform: scale(1.05);
-      }
-  
-      .modal-buttons {
-          display: flex;
-          justify-content: center;
-          gap: 10px;
-          margin-top: 20px;
-      }
-  
-      .skip-btn {
-          background: #7c4dff;
-      }
-  
-      .cancel-btn {
-          background: #ff4081;
-      }
-  
-      .edit-modal input {
-          background: rgba(255,255,255,0.2);
-          border: none;
-          color: white;
-          border-radius: 5px;
-      }
-  
-      .edit-modal button {
-          padding: 8px 15px;
-          margin: 5px;
-          border-radius: 5px;
-          border: none;
-          cursor: pointer;
-      }
-  
-      .round-history {
-          margin: 20px 0;
-          padding: 15px;
-          background: rgba(255,255,255,0.05);
-          border-radius: 10px;
-      }
-  
-      .round-history h2 {
-          color: #ff4081;
-          margin-bottom: 10px;
-      }
-  
-      .video-controls {
-          background: rgba(0,0,0,0.7);
-          padding: 10px;
-          border-radius: 0 0 10px 10px;
-      }
-  
-      .progress-bar {
-          width: 100%;
-          height: 5px;
-          background: rgba(255,255,255,0.2);
-          margin-bottom: 10px;
-          cursor: pointer;
-          border-radius: 5px;
-      }
-  
-      #progress {
-          width: 0%;
-          height: 100%;
-          background: #ff4081;
-          border-radius: 5px;
-          transition: width 0.1s linear;
-      }
-  
-      #qualitySelect {
-          background: rgba(255,255,255,0.1);
-          color: white;
-          border: none;
-          padding: 5px 10px;
-          border-radius: 5px;
-          margin-left: 10px;
-      }
-      
-      .video-layout {
-          position: relative;
-          width: 100%;
-          margin-bottom: 20px;
-      }
-  
-      #webcamContainer {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          width: 160px;
-          height: 120px;
-          border: 2px solid #ff4081;
-          border-radius: 8px;
-          overflow: hidden;
-          z-index: 10;
-      }
-  
-      #webcamVideo {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transform: scaleX(-1); /* Mirror webcam */
-      }
-  
-      .audio-monitor {
-          position: absolute;
-          bottom: 10px;
-          right: 10px;
-          background: rgba(0,0,0,0.7);
-          padding: 5px;
-          border-radius: 5px;
-          color: #fff;
-          font-size: 12px;
-      }
-  
-      .audio-level {
-          width: 100px;
-          height: 10px;
-          background: rgba(255,255,255,0.2);
-          border-radius: 5px;
-          overflow: hidden;
-      }
-  
-      .audio-level-bar {
-          height: 100%;
-          width: 0%;
-          background: #ff4081;
-          transition: width 0.1s;
-      }
-  
-      .voting-section {
-          text-align: center;
-          margin: 20px 0;
-          padding: 20px;
-          background: rgba(255,255,255,0.1);
-          border-radius: 10px;
-      }
-  
-      #qrCode {
-          display: inline-block;
-          padding: 10px;
-          background: white;
-          border-radius: 5px;
-          margin: 10px 0;
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
+      color: white;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .welcome-screen {
+      text-align: center;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      margin: 50px auto;
+      max-width: 600px;
+    }
+
+    .welcome-screen input {
+      width: 100%;
+      padding: 15px;
+      margin: 20px 0;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 18px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 30px;
+      background: linear-gradient(45deg, #ff4081, #7c4dff);
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .header h2 {
+      margin-top: 10px;
+      font-size: 1.5em;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .song-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .queue-list {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      height: fit-content;
+    }
+
+    .queue-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+
+    .song-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .song-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .song-card img {
+      border-radius: 5px;
+    }
+
+    .player-container {
+      grid-column: 1 / -1;
+      order: -1;
+      margin-bottom: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .player-container h2 {
+      color: #fff;
+      margin-bottom: 15px;
+      text-align: center;
+      font-size: 1.8em;
+    }
+
+    #youtubePlayer {
+      width: 100%;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #ff4081;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #7c4dff;
+    }
+
+    .score-display {
+      text-align: center;
+      font-size: 24px;
+      margin: 20px 0;
+    }
+
+    .queue-status {
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.8em;
+      font-weight: bold;
+    }
+
+    .status-waiting {
+      background: #ffd700;
+      color: black;
+    }
+
+    .status-playing {
+      background: #00ff00;
+      color: black;
+    }
+
+    .status-finished {
+      background: #ff4081;
+      color: white;
+    }
+
+    .queue-score {
+      font-weight: bold;
+      color: #7c4dff;
+    }
+
+    .final-score-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      background-blend-mode: overlay;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .final-score-content {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 40px;
+      border-radius: 15px;
+      animation: scorePopup 0.5s ease-out;
+    }
+
+    @keyframes scorePopup {
+      0% {
+        transform: scale(0);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .ranking-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .ranking-content {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .rankings-list {
+      margin: 20px 0;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 5px 0;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+    }
+
+    .position {
+      font-weight: bold;
+      color: #ff4081;
+    }
+
+    .edit-btn,
+    .delete-btn {
+      padding: 5px 10px;
+      margin-left: 5px;
+      font-size: 0.8em;
+    }
+
+    .delete-btn {
+      background: #ff4081;
+    }
+
+    .edit-btn {
+      background: #7c4dff;
+    }
+
+    .singer-input {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .singer-list {
+      margin: 20px 0;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .singer-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+
+    .singer-item button {
+      padding: 5px 10px;
+      font-size: 0.8em;
+      background: #ff4081;
+    }
+
+    .song-selection-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .song-selection-content {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .song-selection-modal .song-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .song-selection-modal .song-card {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .song-selection-modal .song-card:hover {
+      transform: scale(1.05);
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .skip-btn {
+      background: #7c4dff;
+    }
+
+    .cancel-btn {
+      background: #ff4081;
+    }
+
+    .edit-modal input {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      border-radius: 5px;
+    }
+
+    .edit-modal button {
+      padding: 8px 15px;
+      margin: 5px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+    }
+
+    .round-history {
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    .round-history h2 {
+      color: #ff4081;
+      margin-bottom: 10px;
+    }
+
+    .video-controls {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.2);
+      margin-bottom: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #progress {
+      width: 0%;
+      height: 100%;
+      background: #ff4081;
+      border-radius: 5px;
+      transition: width 0.1s linear;
+    }
+
+    #qualitySelect {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      margin-left: 10px;
+    }
+
+    .video-layout {
+      position: relative;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    #webcamContainer {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 160px;
+      height: 120px;
+      border: 2px solid #ff4081;
+      border-radius: 8px;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    #webcamVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      /* Mirror webcam */
+    }
+
+    .audio-monitor {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 5px;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .audio-level {
+      width: 100px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .audio-level-bar {
+      height: 100%;
+      width: 0%;
+      background: #ff4081;
+      transition: width 0.1s;
+    }
+
+    .voting-section {
+      text-align: center;
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    #qrCode {
+      display: inline-block;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+      margin: 10px 0;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/jzz"></script>
   <script src="https://cdn.jsdelivr.net/npm/web-midi-api"></script>
   <script src="https://unpkg.com/midi-parser-js/src/midi-parser.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-  </head>
-  <body>
-      <div id="welcomeScreen" class="welcome-screen">
-          <h1>Welcome to Karaoke Star! &#x1f3a4;</h1>
-          <div class="singer-input">
-              <input type="text" id="singerName" placeholder="Enter singer name">
-              <button onclick="addSinger()">Add Singer</button>
+</head>
+
+<body>
+  <div id="welcomeScreen" class="welcome-screen">
+    <h1>Welcome to Karaoke Star! &#x1f3a4;</h1>
+    <div class="singer-input">
+      <input type="text" id="singerName" placeholder="Enter singer name">
+      <button onclick="addSinger()">Add Singer</button>
+    </div>
+    <div id="singerList" class="singer-list">
+      <!-- Singer list will be populated here -->
+    </div>
+    <button id="startRoundBtn" onclick="startKaraokeSession()">Start Round</button>
+  </div>
+
+  <div id="mainContent" class="container" style="display: none;">
+    <div class="header">
+      <h1>&#x1f3a4; Karaoke Star &#x1f31f;</h1>
+      <h2 id="currentSinger"></h2>
+    </div>
+
+    <div class="main-content">
+      <div class="player-container" id="playerContainer" style="display: none;">
+        <div class="video-layout">
+          <div id="youtubePlayer"></div>
+          <div id="webcamContainer">
+            <video id="webcamVideo" autoplay playsinline></video>
           </div>
-          <div id="singerList" class="singer-list">
-              <!-- Singer list will be populated here -->
+          <div class="audio-monitor">
+            <div class="audio-level">
+              <div class="audio-level-bar"></div>
+            </div>
           </div>
-          <button id="startRoundBtn" onclick="startKaraokeSession()">Start Round</button>
+        </div>
+        <div class="video-controls">
+          <div class="progress-bar">
+            <div id="progress"></div>
+          </div>
+          <div class="controls">
+            <button onclick="playVideo()" id="playButton">&#x25b6; Play</button>
+            <button onclick="pauseVideo()">&#x23f8; Pause</button>
+            <button onclick="stopVideo()">&#x23f9; Stop</button>
+            <button onclick="restartVideo()">&#x1f504; Restart</button>
+            <button onclick="toggleFullscreen()">&#x26f6; Fullscreen</button>
+            <select id="qualitySelect" onchange="setVideoQuality()">
+              <option value="small">240p</option>
+              <option value="medium">360p</option>
+              <option value="large">480p</option>
+              <option value="hd720">720p</option>
+              <option value="hd1080">1080p</option>
+            </select>
+          </div>
+          <div class="score-display" id="scoreDisplay">Score: 0</div>
+        </div>
       </div>
-  
-      <div id="mainContent" class="container" style="display: none;">
-          <div class="header">
-              <h1>&#x1f3a4; Karaoke Star &#x1f31f;</h1>
-              <h2 id="currentSinger"></h2>
-          </div>
-  
-          <div class="main-content">
-              <div class="player-container" id="playerContainer" style="display: none;">
-                  <div class="video-layout">
-                      <div id="youtubePlayer"></div>
-                      <div id="webcamContainer">
-                          <video id="webcamVideo" autoplay playsinline></video>
-                      </div>
-                      <div class="audio-monitor">
-                          <div class="audio-level">
-                              <div class="audio-level-bar"></div>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="video-controls">
-                      <div class="progress-bar">
-                          <div id="progress"></div>
-                      </div>
-                      <div class="controls">
-                          <button onclick="playVideo()" id="playButton">&#x25b6; Play</button>
-                          <button onclick="pauseVideo()">&#x23f8; Pause</button>
-                          <button onclick="stopVideo()">&#x23f9; Stop</button>
-                          <button onclick="restartVideo()">&#x1f504; Restart</button>
-                          <button onclick="toggleFullscreen()">&#x26f6; Fullscreen</button>
-                          <select id="qualitySelect" onchange="setVideoQuality()">
-                              <option value="small">240p</option>
-                              <option value="medium">360p</option>
-                              <option value="large">480p</option>
-                              <option value="hd720">720p</option>
-                              <option value="hd1080">1080p</option>
-                          </select>
-                      </div>
-                      <div class="score-display" id="scoreDisplay">Score: 0</div>
-                  </div>
-              </div>
-  
-              <div class="song-section">
-                  <div class="song-list" id="songList">
-                      <!-- Songs will be populated here -->
-                  </div>
-              </div>
-  
-              <div class="queue-list">
-                  <h2>Lista de Espera</h2>
-                  <div id="singerQueue">
-                      <!-- Queue will be populated here -->
-                  </div>
-              </div>
-              <div class="voting-section">
-                  <h3>Scan to Vote!</h3>
-                  <div id="qrCode"></div>
-              </div>
-          </div>
+
+      <div class="song-section">
+        <div class="song-list" id="songList">
+          <!-- Songs will be populated here -->
+        </div>
       </div>
-  
-      <div id="finalScoreScreen" class="final-score-screen">
-          <div class="final-score-content">
-              <h1>Amazing Performance! &#x1f31f;</h1>
-              <h2 id="finalSingerName"></h2>
-              <h3 id="finalScore"></h3>
-          </div>
+
+      <div class="queue-list">
+        <h2>Lista de Espera</h2>
+        <div id="singerQueue">
+          <!-- Queue will be populated here -->
+        </div>
       </div>
-  
-      <div class="song-selection-modal" id="songSelectionModal" style="display: none;">
-          <div class="song-selection-content">
-              <div class="song-list" id="songSelectionList">
-                  <!-- Songs will be populated here -->
-              </div>
-              <div class="modal-buttons">
-                  <button class="skip-btn">Skip</button>
-                  <button class="cancel-btn">Cancel</button>
-              </div>
-          </div>
+      <div class="voting-section">
+        <h3>Scan to Vote!</h3>
+        <div id="qrCode"></div>
       </div>
-  
+    </div>
+  </div>
+
+  <div id="finalScoreScreen" class="final-score-screen">
+    <div class="final-score-content">
+      <h1>Amazing Performance! &#x1f31f;</h1>
+      <h2 id="finalSingerName"></h2>
+      <h3 id="finalScore"></h3>
+    </div>
+  </div>
+
+  <div class="song-selection-modal" id="songSelectionModal" style="display: none;">
+    <div class="song-selection-content">
+      <div class="song-list" id="songSelectionList">
+        <!-- Songs will be populated here -->
+      </div>
+      <div class="modal-buttons">
+        <button class="skip-btn">Skip</button>
+        <button class="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-  let midiAccess = null;
-  let midiOutput = null;
-  let karaokePlayer = null;
-  let currentSinger = '';
-  let singerQueue = [];
-  let youtubePlayer;
-  const YOUTUBE_API_KEY = 'AIzaSyC_dafsvQzydiBY-oPiKJKxUruTsYGGm7I';
-  const PLAYLIST_ID = 'PLsdthlVxRCFrPMX3WPIC_vTHdSHy0IPAL';
-  let youtubeVideos = [];
-  const QueueStatus = {
-    WAITING: 'Aguardando',
-    PLAYING: 'Em execução',
-    FINISHED: 'Finalizado'
-  };
-  let rounds = [];
-  let currentRound = {
-    id: 1,
-    singers: [],
-    rankings: []
-  };
-  let initialSingers = [];
-  let webcamStream = null;
-  let audioContext;
-  let audioAnalyser;
-  let microphone;
-  let recognition;
-  let audioLevel = 0;
-  let pitchAccuracy = 0;
-  let wordAccuracy = 0;
-  let currentVotingId = null;
-  let votes = {};
-  
-  navigator.requestMIDIAccess().then(function (access) {
-    midiAccess = access;
-    initializeMIDI();
-  }).catch(function (error) {
-    console.error("Could not access MIDI devices:", error);
-  });
-  function initializeMIDI() {
-    const outputs = midiAccess.outputs;
-    midiOutput = outputs.values().next().value;
-    if (midiOutput) {} else {}
-  }
-  async function loadKarFile(fileName) {
-    try {
-      const response = await fetch(fileName);
-      const arrayBuffer = await response.arrayBuffer();
-      return parseMidiFile(arrayBuffer);
-    } catch (error) {
-      console.error('Error loading .kar file:', error);
-      return null;
+    let midiAccess = null;
+    let midiOutput = null;
+    let karaokePlayer = null;
+    let currentSinger = '';
+    let singerQueue = [];
+    let youtubePlayer;
+    const YOUTUBE_API_KEY = 'AIzaSyC_dafsvQzydiBY-oPiKJKxUruTsYGGm7I';
+    const PLAYLIST_ID = 'PLsdthlVxRCFrPMX3WPIC_vTHdSHy0IPAL';
+    let youtubeVideos = [];
+    const QueueStatus = {
+      WAITING: 'Aguardando',
+      PLAYING: 'Em execução',
+      FINISHED: 'Finalizado'
+    };
+    let rounds = [];
+    let currentRound = {
+      id: 1,
+      singers: [],
+      rankings: []
+    };
+    let initialSingers = [];
+    let webcamStream = null;
+    let audioContext;
+    let audioAnalyser;
+    let microphone;
+    let recognition;
+    let audioLevel = 0;
+    let pitchAccuracy = 0;
+    let wordAccuracy = 0;
+    let currentVotingId = null;
+    let votes = {};
+
+    navigator.requestMIDIAccess().then(function (access) {
+      midiAccess = access;
+      initializeMIDI();
+    }).catch(function (error) {
+      console.error("Could not access MIDI devices:", error);
+    });
+    function initializeMIDI() {
+      const outputs = midiAccess.outputs;
+      midiOutput = outputs.values().next().value;
+      if (midiOutput) { } else { }
     }
-  }
-  function parseMidiFile(arrayBuffer) {
-    const midiFile = new Uint8Array(arrayBuffer);
-    return MidiParser.parse(midiFile);
-  }
-  const songs = [{
-    title: "É o Amor - Zezé di Camargo & Luciano",
-    file: "Zeze_di_Camargo_e_Luciano_-_E_o_amor.kar",
-    midiData: null
-  }];
-  let currentSong = null;
-  let currentLyricIndex = 0;
-  let score = 0;
-  let timer = null;
-  let isPlaying = false;
-  class KaraokePlayer {
-    constructor(midiData, midiOutput) {
-      this.midiData = midiData;
-      this.midiOutput = midiOutput;
-      this.currentTime = 0;
-      this.events = this.parseMidiEvents();
-      this.currentEventIndex = 0;
+    async function loadKarFile(fileName) {
+      try {
+        const response = await fetch(fileName);
+        const arrayBuffer = await response.arrayBuffer();
+        return parseMidiFile(arrayBuffer);
+      } catch (error) {
+        console.error('Error loading .kar file:', error);
+        return null;
+      }
     }
-    parseMidiEvents() {
-      if (!this.midiData || !this.midiData.track) return [];
-      let events = [];
-      this.midiData.track.forEach((track, trackIndex) => {
-        if (track.event) {
-          track.event.forEach(event => {
-            events.push({
-              ...event,
-              trackIndex,
-              absoluteTime: event.deltaTime
+    function parseMidiFile(arrayBuffer) {
+      const midiFile = new Uint8Array(arrayBuffer);
+      return MidiParser.parse(midiFile);
+    }
+    const songs = [{
+      title: "É o Amor - Zezé di Camargo & Luciano",
+      file: "Zeze_di_Camargo_e_Luciano_-_E_o_amor.kar",
+      midiData: null
+    }];
+    let currentSong = null;
+    let currentLyricIndex = 0;
+    let score = 0;
+    let timer = null;
+    let isPlaying = false;
+    class KaraokePlayer {
+      constructor(midiData, midiOutput) {
+        this.midiData = midiData;
+        this.midiOutput = midiOutput;
+        this.currentTime = 0;
+        this.events = this.parseMidiEvents();
+        this.currentEventIndex = 0;
+      }
+      parseMidiEvents() {
+        if (!this.midiData || !this.midiData.track) return [];
+        let events = [];
+        this.midiData.track.forEach((track, trackIndex) => {
+          if (track.event) {
+            track.event.forEach(event => {
+              events.push({
+                ...event,
+                trackIndex,
+                absoluteTime: event.deltaTime
+              });
             });
-          });
+          }
+        });
+        return events.sort((a, b) => a.absoluteTime - b.absoluteTime);
+      }
+      play() {
+        if (!this.events.length) return;
+        this.isPlaying = true;
+        this.playNextEvent();
+      }
+      playNextEvent() {
+        if (!this.isPlaying || this.currentEventIndex >= this.events.length) {
+          this.stop();
+          return;
         }
-      });
-      return events.sort((a, b) => a.absoluteTime - b.absoluteTime);
-    }
-    play() {
-      if (!this.events.length) return;
-      this.isPlaying = true;
-      this.playNextEvent();
-    }
-    playNextEvent() {
-      if (!this.isPlaying || this.currentEventIndex >= this.events.length) {
-        this.stop();
-        return;
-      }
-      const event = this.events[this.currentEventIndex];
-      if (event.type === 'noteOn' && this.midiOutput) {
-        this.midiOutput.send([0x90, event.data[0], event.data[1]]);
-      } else if (event.type === 'noteOff' && this.midiOutput) {
-        this.midiOutput.send([0x80, event.data[0], 0]);
-      }
-      this.currentEventIndex++;
-      if (this.currentEventIndex < this.events.length) {
-        const nextEvent = this.events[this.currentEventIndex];
-        const delay = nextEvent.absoluteTime - event.absoluteTime;
-        setTimeout(() => this.playNextEvent(), delay);
-      }
-    }
-    stop() {
-      this.isPlaying = false;
-      this.currentEventIndex = 0;
-      if (this.midiOutput) {
-        for (let i = 0; i < 16; i++) {
-          this.midiOutput.send([0xB0 + i, 123, 0]);
+        const event = this.events[this.currentEventIndex];
+        if (event.type === 'noteOn' && this.midiOutput) {
+          this.midiOutput.send([0x90, event.data[0], event.data[1]]);
+        } else if (event.type === 'noteOff' && this.midiOutput) {
+          this.midiOutput.send([0x80, event.data[0], 0]);
+        }
+        this.currentEventIndex++;
+        if (this.currentEventIndex < this.events.length) {
+          const nextEvent = this.events[this.currentEventIndex];
+          const delay = nextEvent.absoluteTime - event.absoluteTime;
+          setTimeout(() => this.playNextEvent(), delay);
         }
       }
+      stop() {
+        this.isPlaying = false;
+        this.currentEventIndex = 0;
+        if (this.midiOutput) {
+          for (let i = 0; i < 16; i++) {
+            this.midiOutput.send([0xB0 + i, 123, 0]);
+          }
+        }
+      }
     }
-  }
-  async function fetchYouTubePlaylist() {
-    try {
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${PLAYLIST_ID}&key=${YOUTUBE_API_KEY}`);
-      const data = await response.json();
-      youtubeVideos = data.items.map(item => ({
-        title: item.snippet.title,
-        videoId: item.snippet.resourceId.videoId,
-        thumbnail: item.snippet.thumbnails.default.url
-      }));
-      return youtubeVideos;
-    } catch (error) {
-      console.error('Error fetching YouTube playlist:', error);
-      return [];
+    async function fetchYouTubePlaylist() {
+      try {
+        const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${PLAYLIST_ID}&key=${YOUTUBE_API_KEY}`);
+        const data = await response.json();
+        youtubeVideos = data.items.map(item => ({
+          title: item.snippet.title,
+          videoId: item.snippet.resourceId.videoId,
+          thumbnail: item.snippet.thumbnails.default.url
+        }));
+        return youtubeVideos;
+      } catch (error) {
+        console.error('Error fetching YouTube playlist:', error);
+        return [];
+      }
     }
-  }
-  async function initializeSongList() {
-    const songList = document.getElementById('songList');
-    songList.innerHTML = '';
-    const videos = await fetchYouTubePlaylist();
-    videos.forEach((video, index) => {
-      const songCard = document.createElement('div');
-      songCard.className = 'song-card';
-      songCard.innerHTML = `
+    async function initializeSongList() {
+      const songList = document.getElementById('songList');
+      songList.innerHTML = '';
+      const videos = await fetchYouTubePlaylist();
+      videos.forEach((video, index) => {
+        const songCard = document.createElement('div');
+        songCard.className = 'song-card';
+        songCard.innerHTML = `
               <img src="${video.thumbnail}" alt="${video.title}" style="width: 120px; height: 90px;">
               <h3>${video.title}</h3>
           `;
-      songCard.addEventListener('click', () => selectYouTubeVideo(index));
-      songList.appendChild(songCard);
-    });
-  }
-  function onYouTubeIframeAPIReady() {
-    youtubePlayer = new YT.Player('youtubePlayer', {
-      height: '360',
-      width: '640',
-      playerVars: {
-        'playsinline': 1,
-        'controls': 1,
-        'autoplay': 0,
-        'rel': 0,
-        'showinfo': 0,
-        'fs': 1,
-        'modestbranding': 1,
-        'iv_load_policy': 3,
-        'quality': 'hd720'
-      },
-      events: {
-        'onStateChange': onPlayerStateChange,
-        'onReady': onPlayerReady
-      }
-    });
-  }
-  function addToQueue(singerName, songTitle) {
-    singerQueue.push({
-      name: singerName,
-      song: songTitle,
-      status: QueueStatus.WAITING,
-      score: null
-    });
-    updateQueueDisplay();
-    saveQueueToStorage();
-  }
-  function updateQueueDisplay() {
-    const queueContainer = document.getElementById('singerQueue');
-    queueContainer.innerHTML = '';
-    singerQueue.forEach((item, index) => {
-      const queueItem = document.createElement('div');
-      queueItem.className = 'queue-item';
-      let statusClass = '';
-      switch (item.status) {
-        case QueueStatus.WAITING:
-          statusClass = 'status-waiting';
-          break;
-        case QueueStatus.PLAYING:
-          statusClass = 'status-playing';
-          break;
-        case QueueStatus.FINISHED:
-          statusClass = 'status-finished';
-          break;
-      }
-      queueItem.innerHTML = `
+        songCard.addEventListener('click', () => selectYouTubeVideo(index));
+        songList.appendChild(songCard);
+      });
+    }
+    function onYouTubeIframeAPIReady() {
+      youtubePlayer = new YT.Player('youtubePlayer', {
+        height: '360',
+        width: '640',
+        playerVars: {
+          'playsinline': 1,
+          'controls': 1,
+          'autoplay': 0,
+          'rel': 0,
+          'showinfo': 0,
+          'fs': 1,
+          'modestbranding': 1,
+          'iv_load_policy': 3,
+          'quality': 'hd720'
+        },
+        events: {
+          'onStateChange': onPlayerStateChange,
+          'onReady': onPlayerReady
+        }
+      });
+    }
+    function addToQueue(singerName, songTitle) {
+      singerQueue.push({
+        name: singerName,
+        song: songTitle,
+        status: QueueStatus.WAITING,
+        score: null
+      });
+      updateQueueDisplay();
+      saveQueueToStorage();
+    }
+    function updateQueueDisplay() {
+      const queueContainer = document.getElementById('singerQueue');
+      queueContainer.innerHTML = '';
+      singerQueue.forEach((item, index) => {
+        const queueItem = document.createElement('div');
+        queueItem.className = 'queue-item';
+        let statusClass = '';
+        switch (item.status) {
+          case QueueStatus.WAITING:
+            statusClass = 'status-waiting';
+            break;
+          case QueueStatus.PLAYING:
+            statusClass = 'status-playing';
+            break;
+          case QueueStatus.FINISHED:
+            statusClass = 'status-finished';
+            break;
+        }
+        queueItem.innerHTML = `
               <div>
                   <p><strong>${item.name}</strong></p>
                   <p class="song-title">${item.song}</p>
@@ -791,14 +802,14 @@
                   <button onclick="deleteQueueItem(${index})" class="delete-btn">Delete</button>
               </div>
           `;
-      queueContainer.appendChild(queueItem);
-    });
-  }
-  function editQueueItem(index) {
-    const item = singerQueue[index];
-    const modal = document.createElement('div');
-    modal.className = 'edit-modal';
-    modal.style.cssText = `
+        queueContainer.appendChild(queueItem);
+      });
+    }
+    function editQueueItem(index) {
+      const item = singerQueue[index];
+      const modal = document.createElement('div');
+      modal.className = 'edit-modal';
+      modal.style.cssText = `
           position: fixed;
           top: 0;
           left: 0;
@@ -810,15 +821,15 @@
           align-items: center;
           z-index: 1000;
       `;
-    const content = document.createElement('div');
-    content.className = 'edit-content';
-    content.style.cssText = `
+      const content = document.createElement('div');
+      content.className = 'edit-content';
+      content.style.cssText = `
           background: rgba(255,255,255,0.1);
           padding: 20px;
           border-radius: 10px;
           width: 400px;
       `;
-    content.innerHTML = `
+      content.innerHTML = `
           <h2>Edit Queue Item</h2>
           <div style="margin: 20px 0;">
               <label>Singer Name:</label>
@@ -829,40 +840,40 @@
               <button onclick="closeModal(this.parentElement.parentElement.parentElement)">Cancel</button>
           </div>
       `;
-    modal.appendChild(content);
-    document.body.appendChild(modal);
-  }
-  function updateQueueItem(index) {
-    const newName = document.getElementById('editName').value.trim();
-    if (newName) {
-      singerQueue[index].name = newName;
-      updateQueueDisplay();
-      saveQueueToStorage();
-      closeModal(document.querySelector('.edit-modal'));
+      modal.appendChild(content);
+      document.body.appendChild(modal);
     }
-  }
-  function deleteQueueItem(index) {
-    if (confirm('Are you sure you want to remove this item from the queue?')) {
-      singerQueue.splice(index, 1);
-      updateQueueDisplay();
-      saveQueueToStorage();
+    function updateQueueItem(index) {
+      const newName = document.getElementById('editName').value.trim();
+      if (newName) {
+        singerQueue[index].name = newName;
+        updateQueueDisplay();
+        saveQueueToStorage();
+        closeModal(document.querySelector('.edit-modal'));
+      }
     }
-  }
-  function addSinger() {
-    const singerName = document.getElementById('singerName').value.trim();
-    if (!singerName) {
-      alert('Please enter a singer name!');
-      return;
+    function deleteQueueItem(index) {
+      if (confirm('Are you sure you want to remove this item from the queue?')) {
+        singerQueue.splice(index, 1);
+        updateQueueDisplay();
+        saveQueueToStorage();
+      }
     }
-    initialSingers.push(singerName);
-    document.getElementById('singerName').value = '';
-    updateSingerList();
-    showSongSelectionModal(singerName);
-  }
-  function showSongSelectionModal(singerName) {
-    const modal = document.createElement('div');
-    modal.className = 'song-selection-modal';
-    modal.style.cssText = `
+    function addSinger() {
+      const singerName = document.getElementById('singerName').value.trim();
+      if (!singerName) {
+        alert('Please enter a singer name!');
+        return;
+      }
+      initialSingers.push(singerName);
+      document.getElementById('singerName').value = '';
+      updateSingerList();
+      showSongSelectionModal(singerName);
+    }
+    function showSongSelectionModal(singerName) {
+      const modal = document.createElement('div');
+      modal.className = 'song-selection-modal';
+      modal.style.cssText = `
           position: fixed;
           top: 0;
           left: 0;
@@ -874,7 +885,7 @@
           align-items: center;
           z-index: 1000;
       `;
-    modal.innerHTML = `
+      modal.innerHTML = `
       <div class="song-selection-content">
         <h2>Select a Song for ${singerName}</h2>
         <div id="modalSongList" class="song-list"></div>
@@ -884,153 +895,153 @@
         </div>
       </div>
     `;
-    document.body.appendChild(modal);
-    fetchYouTubePlaylist().then(videos => {
-      const songList = document.getElementById('modalSongList');
-      videos.forEach((video, index) => {
-        const songCard = document.createElement('div');
-        songCard.className = 'song-card';
-        songCard.innerHTML = `
+      document.body.appendChild(modal);
+      fetchYouTubePlaylist().then(videos => {
+        const songList = document.getElementById('modalSongList');
+        videos.forEach((video, index) => {
+          const songCard = document.createElement('div');
+          songCard.className = 'song-card';
+          songCard.innerHTML = `
           <img src="${video.thumbnail}" alt="${video.title}" style="width: 120px; height: 90px;">
           <h3>${video.title}</h3>
         `;
-        songCard.addEventListener('click', () => {
-          addToQueue(singerName, video.title);
-          closeModal(modal);
-        });
-        songList.appendChild(songCard);
-      });
-    });
-  }
-  function closeModal(modal) {
-    modal.remove();
-  }
-  function selectYouTubeVideo(index) {
-    const video = youtubeVideos[index];
-    if (!video) return;
-    const playingIndex = singerQueue.findIndex(item => item.status === QueueStatus.PLAYING);
-    if (playingIndex !== -1) {
-      singerQueue[playingIndex].status = QueueStatus.FINISHED;
-    }
-    addToQueue(currentSinger, video.title);
-    const currentQueueIndex = singerQueue.length - 1;
-    singerQueue[currentQueueIndex].status = QueueStatus.PLAYING;
-    updateQueueDisplay();
-    saveQueueToStorage();
-    const playerContainer = document.getElementById('playerContainer');
-    playerContainer.style.display = 'block';
-    youtubePlayer.cueVideoById(video.videoId);
-  }
-  function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) {
-      const finalScore = calculateFinalScore(currentVotingId);
-      showFinalScore(finalScore);
-    }
-  }
-  async function startKaraokeSession() {
-    singerQueue = initialSingers.map(name => ({
-      name: name,
-      song: null,
-      status: QueueStatus.WAITING,
-      score: null
-    }));
-    currentSinger = singerQueue[0].name;
-    try {
-      webcamStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: 160,
-          height: 120,
-          facingMode: 'user'
-        },
-        audio: false
-      });
-      const webcamVideo = document.getElementById('webcamVideo');
-      webcamVideo.srcObject = webcamStream;
-    } catch (err) {
-      console.error('Webcam access error:', err);
-    }
-    await initializeAudio();
-    document.getElementById('welcomeScreen').style.display = 'none';
-    document.getElementById('mainContent').style.display = 'block';
-    document.getElementById('currentSinger').textContent = `Current Singer: ${currentSinger}`;
-    loadQueueFromStorage();
-    initializeSongList();
-    const firstQueuedItem = singerQueue.find(item => item.song !== null);
-    if (firstQueuedItem) {
-      showQueuedSong(firstQueuedItem);
-    }
-    generateVotingQRCode();
-  }
-  async function initializeAudio() {
-      try {
-          audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          const audioStream = await navigator.mediaDevices.getUserMedia({ 
-              audio: {
-                  echoCancellation: true,
-                  noiseSuppression: true,
-                  autoGainControl: true
-              }
+          songCard.addEventListener('click', () => {
+            addToQueue(singerName, video.title);
+            closeModal(modal);
           });
-          microphone = audioContext.createMediaStreamSource(audioStream);
-          audioAnalyser = audioContext.createAnalyser();
-          audioAnalyser.fftSize = 2048;
-          microphone.connect(audioAnalyser);
-          if ('webkitSpeechRecognition' in window) {
-              recognition = new webkitSpeechRecognition();
-              recognition.continuous = true;
-              recognition.interimResults = true;
-              recognition.onresult = (event) => {
-                  const transcript = Array.from(event.results)
-                      .map(result => result[0].transcript)
-                      .join('');
-                  wordAccuracy = calculateWordAccuracy(transcript);
-                  updateScore();
-              };
-              recognition.start();
-          }
-          monitorAudioLevel();
-      } catch (err) {
-          console.error('Audio initialization error:', err);
-          audioLevel = 0;
-          pitchAccuracy = 0;
-          wordAccuracy = 0;
-          updateScore();
+          songList.appendChild(songCard);
+        });
+      });
+    }
+    function closeModal(modal) {
+      modal.remove();
+    }
+    function selectYouTubeVideo(index) {
+      const video = youtubeVideos[index];
+      if (!video) return;
+      const playingIndex = singerQueue.findIndex(item => item.status === QueueStatus.PLAYING);
+      if (playingIndex !== -1) {
+        singerQueue[playingIndex].status = QueueStatus.FINISHED;
       }
-  }
-  
-  function monitorAudioLevel() {
+      addToQueue(currentSinger, video.title);
+      const currentQueueIndex = singerQueue.length - 1;
+      singerQueue[currentQueueIndex].status = QueueStatus.PLAYING;
+      updateQueueDisplay();
+      saveQueueToStorage();
+      const playerContainer = document.getElementById('playerContainer');
+      playerContainer.style.display = 'block';
+      youtubePlayer.cueVideoById(video.videoId);
+    }
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.ENDED) {
+        const finalScore = calculateFinalScore(currentVotingId);
+        showFinalScore(finalScore);
+      }
+    }
+    async function startKaraokeSession() {
+      singerQueue = initialSingers.map(name => ({
+        name: name,
+        song: null,
+        status: QueueStatus.WAITING,
+        score: null
+      }));
+      currentSinger = singerQueue[0].name;
+      try {
+        webcamStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: 160,
+            height: 120,
+            facingMode: 'user'
+          },
+          audio: false
+        });
+        const webcamVideo = document.getElementById('webcamVideo');
+        webcamVideo.srcObject = webcamStream;
+      } catch (err) {
+        console.error('Webcam access error:', err);
+      }
+      await initializeAudio();
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('currentSinger').textContent = `Current Singer: ${currentSinger}`;
+      loadQueueFromStorage();
+      initializeSongList();
+      const firstQueuedItem = singerQueue.find(item => item.song !== null);
+      if (firstQueuedItem) {
+        showQueuedSong(firstQueuedItem);
+      }
+      generateVotingQRCode();
+    }
+    async function initializeAudio() {
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+          }
+        });
+        microphone = audioContext.createMediaStreamSource(audioStream);
+        audioAnalyser = audioContext.createAnalyser();
+        audioAnalyser.fftSize = 2048;
+        microphone.connect(audioAnalyser);
+        if ('webkitSpeechRecognition' in window) {
+          recognition = new webkitSpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+              .map(result => result[0].transcript)
+              .join('');
+            wordAccuracy = calculateWordAccuracy(transcript);
+            updateScore();
+          };
+          recognition.start();
+        }
+        monitorAudioLevel();
+      } catch (err) {
+        console.error('Audio initialization error:', err);
+        audioLevel = 0;
+        pitchAccuracy = 0;
+        wordAccuracy = 0;
+        updateScore();
+      }
+    }
+
+    function monitorAudioLevel() {
       const dataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
       function update() {
-          if (!audioAnalyser) return;
-          audioAnalyser.getByteFrequencyData(dataArray);
-          let sum = 0;
-          let maxFreq = 0;
-          for (let i = 0; i < dataArray.length; i++) {
-              sum += dataArray[i];
-              if (dataArray[i] > maxFreq) {
-                  maxFreq = dataArray[i];
-              }
+        if (!audioAnalyser) return;
+        audioAnalyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        let maxFreq = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+          if (dataArray[i] > maxFreq) {
+            maxFreq = dataArray[i];
           }
-          audioLevel = sum / (dataArray.length * 256);
-          pitchAccuracy = maxFreq / 256;
-          const audioLevelBar = document.querySelector('.audio-level-bar');
-          if (audioLevelBar) {
-              audioLevelBar.style.width = `${audioLevel * 100}%`;
-          }
-          updateScore();
-          requestAnimationFrame(update);
+        }
+        audioLevel = sum / (dataArray.length * 256);
+        pitchAccuracy = maxFreq / 256;
+        const audioLevelBar = document.querySelector('.audio-level-bar');
+        if (audioLevelBar) {
+          audioLevelBar.style.width = `${audioLevel * 100}%`;
+        }
+        updateScore();
+        requestAnimationFrame(update);
       }
       update();
-  }
-  
-  function updateScore() {
+    }
+
+    function updateScore() {
       if (!audioAnalyser) {
-          score = 0;
-          const scoreDisplay = document.getElementById('scoreDisplay');
-          if (scoreDisplay) {
-              scoreDisplay.textContent = `Score: 0`;
-          }
-          return;
+        score = 0;
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        if (scoreDisplay) {
+          scoreDisplay.textContent = `Score: 0`;
+        }
+        return;
       }
       const volumeWeight = 0.3;
       const pitchWeight = 0.4;
@@ -1039,79 +1050,79 @@
       const pitchScore = pitchAccuracy * 100;
       const wordScore = wordAccuracy * 100;
       const newScore = Math.round(
-          volumeScore * volumeWeight +
-          pitchScore * pitchWeight +
-          wordScore * wordWeight
+        volumeScore * volumeWeight +
+        pitchScore * pitchWeight +
+        wordScore * wordWeight
       );
       score = Math.max(0, Math.min(100, newScore));
       const scoreDisplay = document.getElementById('scoreDisplay');
       if (scoreDisplay) {
-          scoreDisplay.textContent = `Score: ${score}`;
+        scoreDisplay.textContent = `Score: ${score}`;
       }
-  }
-  
-  function calculateWordAccuracy(transcript) {
+    }
+
+    function calculateWordAccuracy(transcript) {
       if (!transcript || transcript.trim().length === 0) {
-          return 0;
+        return 0;
       }
       return 0.6 + Math.random() * 0.4;
-  }
-  
-  function showFinalScore(score) {
-    const finalScoreScreen = document.getElementById('finalScoreScreen');
-    finalScoreScreen.style.backgroundImage = 'url("logo-karaoke.jpg")';
-    finalScoreScreen.style.backgroundSize = 'cover';
-    finalScoreScreen.style.backgroundPosition = 'center';
-    document.getElementById('finalSingerName').textContent = currentSinger;
-    document.getElementById('finalScore').textContent = `Final Score: ${score}`;
-    const currentQueueIndex = singerQueue.findIndex(item => item.status === QueueStatus.PLAYING);
-    if (currentQueueIndex !== -1) {
-      singerQueue[currentQueueIndex].status = QueueStatus.FINISHED;
-      singerQueue[currentQueueIndex].score = score;
-      updateQueueDisplay();
-      saveQueueToStorage();
     }
-    const audio = new Audio('finaly-score.mp3');
-    audio.play();
-    finalScoreScreen.style.display = 'flex';
-    const isLastSinger = !singerQueue.some(item => item.status !== QueueStatus.FINISHED);
-    const finalScoreContent = document.querySelector('.final-score-content');
-    if (isLastSinger) {
-      finalScoreContent.innerHTML = `
+
+    function showFinalScore(score) {
+      const finalScoreScreen = document.getElementById('finalScoreScreen');
+      finalScoreScreen.style.backgroundImage = 'url("logo-karaoke.jpg")';
+      finalScoreScreen.style.backgroundSize = 'cover';
+      finalScoreScreen.style.backgroundPosition = 'center';
+      document.getElementById('finalSingerName').textContent = currentSinger;
+      document.getElementById('finalScore').textContent = `Final Score: ${score}`;
+      const currentQueueIndex = singerQueue.findIndex(item => item.status === QueueStatus.PLAYING);
+      if (currentQueueIndex !== -1) {
+        singerQueue[currentQueueIndex].status = QueueStatus.FINISHED;
+        singerQueue[currentQueueIndex].score = score;
+        updateQueueDisplay();
+        saveQueueToStorage();
+      }
+      const audio = new Audio('finaly-score.mp3');
+      audio.play();
+      finalScoreScreen.style.display = 'flex';
+      const isLastSinger = !singerQueue.some(item => item.status !== QueueStatus.FINISHED);
+      const finalScoreContent = document.querySelector('.final-score-content');
+      if (isLastSinger) {
+        finalScoreContent.innerHTML = `
               <h1>Amazing Performance! &#x1f31f;</h1>
               <h2 id="finalSingerName">${currentSinger}</h2>
               <h3 id="finalScore">Final Score: ${score}</h3>
               <button onclick="showRoundRankings()">Show Round Rankings</button>
           `;
-    } else {
-      finalScoreContent.innerHTML = `
+      } else {
+        finalScoreContent.innerHTML = `
               <h1>Amazing Performance! &#x1f31f;</h1>
               <h2 id="finalSingerName">${currentSinger}</h2>
               <h3 id="finalScore">Final Score: ${score}</h3>
               <button onclick="returnToSongSelection()">Next Singer</button>
           `;
+      }
     }
-  }
-  function showRoundRankings() {
-    if (webcamStream) {
-      webcamStream.getTracks().forEach(track => track.stop());
-      webcamStream = null;
-    }
-    const rankings = [...singerQueue].sort((a, b) => b.score - a.score);
-    currentRound.rankings = rankings;
-    rounds.push({
-      ...currentRound
-    });
-    const winner = rankings[0];
-    document.getElementById('finalScoreScreen').style.display = 'none';
-    const applause = new Audio('applause.mp3');
-    applause.play();
-    const rankingScreen = document.createElement('div');
-    rankingScreen.className = 'ranking-screen';
-    rankingScreen.style.backgroundImage = 'url("logo-star.jpg")';
-    rankingScreen.style.backgroundSize = 'cover';
-    rankingScreen.style.backgroundPosition = 'center';
-    rankingScreen.innerHTML = `
+    function showRoundRankings() {
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+      }
+      const rankings = [...singerQueue].sort((a, b) => b.score - a.score);
+      currentRound.rankings = rankings;
+      rounds.push({
+        ...currentRound
+      });
+      const winner = rankings[0];
+      document.getElementById('finalScoreScreen').style.display = 'none';
+      const applause = new Audio('applause.mp3');
+      applause.play();
+      const rankingScreen = document.createElement('div');
+      rankingScreen.className = 'ranking-screen';
+      rankingScreen.style.backgroundImage = 'url("logo-star.jpg")';
+      rankingScreen.style.backgroundSize = 'cover';
+      rankingScreen.style.backgroundPosition = 'center';
+      rankingScreen.innerHTML = `
           <div class="ranking-content">
               <h1>Round ${currentRound.id} Complete!</h1>
               <h2>Winner: ${winner.name} with score ${winner.score}! &#x1f3c6;</h2>
@@ -1130,105 +1141,105 @@
               </div>
           </div>
       `;
-    document.body.appendChild(rankingScreen);
-    saveRounds();
-  }
-  function showQueuedSong(queueItem) {
-    const playerContainer = document.getElementById('playerContainer');
-    playerContainer.style.display = 'block';
-    const video = youtubeVideos.find(v => v.title === queueItem.song);
-    if (!video) return;
-    currentSinger = queueItem.name;
-    document.getElementById('currentSinger').textContent = `Current Singer: ${queueItem.name}`;
-    queueItem.status = QueueStatus.PLAYING;
-    updateQueueDisplay();
-    saveQueueToStorage();
-    youtubePlayer.cueVideoById(video.videoId);
-  }
-  function checkRoundCompletion() {
-    const unfinishedSingers = singerQueue.find(item => item.status !== QueueStatus.FINISHED);
-    if (!unfinishedSingers) {
-      showRoundRankings();
+      document.body.appendChild(rankingScreen);
+      saveRounds();
     }
-  }
-  function startNewRound() {
-    saveRounds();
-    currentRound = {
-      id: currentRound.id + 1,
-      singers: [],
-      rankings: []
-    };
-    singerQueue = [];
-    initialSingers = [];
-    saveQueueToStorage();
-    document.querySelector('.ranking-screen').remove();
-    document.getElementById('welcomeScreen').style.display = 'block';
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('singerList').innerHTML = '';
-    document.getElementById('singerName').value = '';
-    const playerContainer = document.getElementById('playerContainer');
-    if (playerContainer) {
-      playerContainer.style.display = 'none';
-    }
-    if (youtubePlayer) {
-      youtubePlayer.stopVideo();
-    }
-    document.getElementById('currentSinger').textContent = '';
-    const modals = document.querySelectorAll('.song-selection-modal, .edit-modal');
-    modals.forEach(modal => modal.remove());
-    if (webcamStream) {
-      webcamStream.getTracks().forEach(track => track.stop());
-      webcamStream = null;
-    }
-    updateSingerList();
-    if (recognition) {
-      recognition.stop();
-    }
-    if (microphone) {
-      microphone.disconnect();
-    }
-    if (audioContext) {
-      audioContext.close();
-    }
-  }
-  function saveQueueToStorage() {
-    localStorage.setItem('singerQueue', JSON.stringify(singerQueue));
-  }
-  function loadQueueFromStorage() {
-    const savedQueue = localStorage.getItem('singerQueue');
-    if (savedQueue) {
-      singerQueue = JSON.parse(savedQueue);
+    function showQueuedSong(queueItem) {
+      const playerContainer = document.getElementById('playerContainer');
+      playerContainer.style.display = 'block';
+      const video = youtubeVideos.find(v => v.title === queueItem.song);
+      if (!video) return;
+      currentSinger = queueItem.name;
+      document.getElementById('currentSinger').textContent = `Current Singer: ${queueItem.name}`;
+      queueItem.status = QueueStatus.PLAYING;
       updateQueueDisplay();
+      saveQueueToStorage();
+      youtubePlayer.cueVideoById(video.videoId);
     }
-  }
-  function onPlayerReady(event) {}
-  function updateSingerList() {
-    const singerList = document.getElementById('singerList');
-    singerList.innerHTML = '';
-    initialSingers.forEach((singer, index) => {
-      const singerItem = document.createElement('div');
-      singerItem.className = 'singer-item';
-      singerItem.innerHTML = `
+    function checkRoundCompletion() {
+      const unfinishedSingers = singerQueue.find(item => item.status !== QueueStatus.FINISHED);
+      if (!unfinishedSingers) {
+        showRoundRankings();
+      }
+    }
+    function startNewRound() {
+      saveRounds();
+      currentRound = {
+        id: currentRound.id + 1,
+        singers: [],
+        rankings: []
+      };
+      singerQueue = [];
+      initialSingers = [];
+      saveQueueToStorage();
+      document.querySelector('.ranking-screen').remove();
+      document.getElementById('welcomeScreen').style.display = 'block';
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('singerList').innerHTML = '';
+      document.getElementById('singerName').value = '';
+      const playerContainer = document.getElementById('playerContainer');
+      if (playerContainer) {
+        playerContainer.style.display = 'none';
+      }
+      if (youtubePlayer) {
+        youtubePlayer.stopVideo();
+      }
+      document.getElementById('currentSinger').textContent = '';
+      const modals = document.querySelectorAll('.song-selection-modal, .edit-modal');
+      modals.forEach(modal => modal.remove());
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+      }
+      updateSingerList();
+      if (recognition) {
+        recognition.stop();
+      }
+      if (microphone) {
+        microphone.disconnect();
+      }
+      if (audioContext) {
+        audioContext.close();
+      }
+    }
+    function saveQueueToStorage() {
+      localStorage.setItem('singerQueue', JSON.stringify(singerQueue));
+    }
+    function loadQueueFromStorage() {
+      const savedQueue = localStorage.getItem('singerQueue');
+      if (savedQueue) {
+        singerQueue = JSON.parse(savedQueue);
+        updateQueueDisplay();
+      }
+    }
+    function onPlayerReady(event) { }
+    function updateSingerList() {
+      const singerList = document.getElementById('singerList');
+      singerList.innerHTML = '';
+      initialSingers.forEach((singer, index) => {
+        const singerItem = document.createElement('div');
+        singerItem.className = 'singer-item';
+        singerItem.innerHTML = `
               <span>${singer}</span>
               <button onclick="removeSinger(${index})">Remove</button>
           `;
-      singerList.appendChild(singerItem);
-    });
-  }
-  function removeSinger(index) {
-    initialSingers.splice(index, 1);
-    updateSingerList();
-  }
-  function skipSongSelection() {
-    closeModal(document.querySelector('.song-selection-modal'));
-  }
-  function viewAllRounds() {
-    const historyScreen = document.createElement('div');
-    historyScreen.className = 'ranking-screen';
-    historyScreen.style.backgroundImage = 'url("logo-star.jpg")';
-    historyScreen.style.backgroundSize = 'cover';
-    historyScreen.style.backgroundPosition = 'center';
-    historyScreen.innerHTML = `
+        singerList.appendChild(singerItem);
+      });
+    }
+    function removeSinger(index) {
+      initialSingers.splice(index, 1);
+      updateSingerList();
+    }
+    function skipSongSelection() {
+      closeModal(document.querySelector('.song-selection-modal'));
+    }
+    function viewAllRounds() {
+      const historyScreen = document.createElement('div');
+      historyScreen.className = 'ranking-screen';
+      historyScreen.style.backgroundImage = 'url("logo-star.jpg")';
+      historyScreen.style.backgroundSize = 'cover';
+      historyScreen.style.backgroundPosition = 'center';
+      historyScreen.innerHTML = `
       <div class="ranking-content">
         <h1>All Rounds History</h1>
         ${rounds.map(round => `
@@ -1248,140 +1259,140 @@
         <button onclick="this.parentElement.parentElement.remove()">Close History</button>
       </div>
     `;
-    document.body.appendChild(historyScreen);
-  }
-  function saveRounds() {
-    localStorage.setItem('karaoke_rounds', JSON.stringify(rounds));
-  }
-  function loadRounds() {
-    const savedRounds = localStorage.getItem('karaoke_rounds');
-    if (savedRounds) {
-      rounds = JSON.parse(savedRounds);
+      document.body.appendChild(historyScreen);
     }
-  }
-  function playVideo() {
-    if (youtubePlayer) {
-      youtubePlayer.playVideo();
-      updatePlayButton();
+    function saveRounds() {
+      localStorage.setItem('karaoke_rounds', JSON.stringify(rounds));
     }
-  }
-  function pauseVideo() {
-    if (youtubePlayer) {
-      youtubePlayer.pauseVideo();
-      updatePlayButton();
-    }
-  }
-  function stopVideo() {
-    if (youtubePlayer) {
-      youtubePlayer.stopVideo();
-      updatePlayButton();
-    }
-    if (recognition) {
-      recognition.stop();
-    }
-    if (microphone) {
-      microphone.disconnect();
-    }
-  }
-  function restartVideo() {
-    if (youtubePlayer) {
-      youtubePlayer.seekTo(0);
-      youtubePlayer.playVideo();
-    }
-  }
-  function toggleFullscreen() {
-    const iframe = document.querySelector('#youtubePlayer');
-    if (iframe) {
-      if (document.fullscreenElement) {
-        document.exitFullscreen();
-      } else {
-        iframe.requestFullscreen();
+    function loadRounds() {
+      const savedRounds = localStorage.getItem('karaoke_rounds');
+      if (savedRounds) {
+        rounds = JSON.parse(savedRounds);
       }
     }
-  }
-  function setVideoQuality() {
-    const quality = document.getElementById('qualitySelect').value;
-    if (youtubePlayer) {
-      youtubePlayer.setPlaybackQuality(quality);
-    }
-  }
-  function updatePlayButton() {
-    const playButton = document.getElementById('playButton');
-    if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
-      playButton.innerHTML = '&#x23f8; Pause';
-    } else {
-      playButton.innerHTML = '&#x25b6; Play';
-    }
-  }
-  function returnToSongSelection() {
-    document.getElementById('finalScoreScreen').style.display = 'none';
-    document.getElementById('playerContainer').style.display = 'none';
-    const nextSinger = singerQueue.find(item => item.status === QueueStatus.WAITING);
-    if (nextSinger) {
-      currentSinger = nextSinger.name;
-      document.getElementById('currentSinger').textContent = `Current Singer: ${nextSinger.name}`;
-      if (nextSinger.song) {
-        showQueuedSong(nextSinger);
-      } else {
-        showSongSelectionModal(nextSinger.name);
+    function playVideo() {
+      if (youtubePlayer) {
+        youtubePlayer.playVideo();
+        updatePlayButton();
       }
-    } else {
-      showRoundRankings();
     }
-  }
-  
-  function generateVotingId() {
-    return Math.random().toString(36).substring(2, 15);
-  }
-  
-  function generateVotingQRCode() {
-    const votingId = generateVotingId();
-    currentVotingId = votingId;
+    function pauseVideo() {
+      if (youtubePlayer) {
+        youtubePlayer.pauseVideo();
+        updatePlayButton();
+      }
+    }
+    function stopVideo() {
+      if (youtubePlayer) {
+        youtubePlayer.stopVideo();
+        updatePlayButton();
+      }
+      if (recognition) {
+        recognition.stop();
+      }
+      if (microphone) {
+        microphone.disconnect();
+      }
+    }
+    function restartVideo() {
+      if (youtubePlayer) {
+        youtubePlayer.seekTo(0);
+        youtubePlayer.playVideo();
+      }
+    }
+    function toggleFullscreen() {
+      const iframe = document.querySelector('#youtubePlayer');
+      if (iframe) {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          iframe.requestFullscreen();
+        }
+      }
+    }
+    function setVideoQuality() {
+      const quality = document.getElementById('qualitySelect').value;
+      if (youtubePlayer) {
+        youtubePlayer.setPlaybackQuality(quality);
+      }
+    }
+    function updatePlayButton() {
+      const playButton = document.getElementById('playButton');
+      if (youtubePlayer && youtubePlayer.getPlayerState() === YT.PlayerState.PLAYING) {
+        playButton.innerHTML = '&#x23f8; Pause';
+      } else {
+        playButton.innerHTML = '&#x25b6; Play';
+      }
+    }
+    function returnToSongSelection() {
+      document.getElementById('finalScoreScreen').style.display = 'none';
+      document.getElementById('playerContainer').style.display = 'none';
+      const nextSinger = singerQueue.find(item => item.status === QueueStatus.WAITING);
+      if (nextSinger) {
+        currentSinger = nextSinger.name;
+        document.getElementById('currentSinger').textContent = `Current Singer: ${nextSinger.name}`;
+        if (nextSinger.song) {
+          showQueuedSong(nextSinger);
+        } else {
+          showSongSelectionModal(nextSinger.name);
+        }
+      } else {
+        showRoundRankings();
+      }
+    }
 
-    votes[votingId] = {
-        votes: [],
-        timestamp: Date.now()
-    };
-    saveVotesToStorage();
+    function generateVotingId() {
+      return Math.random().toString(36).substring(2, 15);
+    }
 
-    const votingUrl = `${window.location.origin}/votacao.html?id=${votingId}`;
-    const qrContainer = document.getElementById('qrCode');
+    function generateVotingQRCode() {
+      const votingId = generateVotingId();
+      currentVotingId = votingId;
 
-    qrContainer.innerHTML = '';
+      const votes = JSON.parse(localStorage.getItem('karaoke_votes')) || {};
+      votes[votingId] = { votes: [], timestamp: Date.now() };
+      localStorage.setItem('karaoke_votes', JSON.stringify(votes));
 
-    new QRCode(qrContainer, {
+      const votingUrl = `${window.location.origin}/votacao.html?id=${votingId}`;
+      const qrContainer = document.getElementById('qrCode');
+
+      qrContainer.innerHTML = '';
+
+      new QRCode(qrContainer, {
         text: votingUrl,
         width: 128,
-        height: 128
-    });
-}
+        height: 128,
+      });
+    }
 
-  
-  function calculateFinalScore(votingId) {
-    if (!votes[votingId] || votes[votingId].votes.length === 0) {
-      return Math.floor(Math.random() * 41) + 60; 
+
+    function calculateFinalScore(votingId) {
+      if (!votes[votingId] || votes[votingId].votes.length === 0) {
+        return Math.floor(Math.random() * 41) + 60;
+      }
+
+      const totalVotes = votes[votingId].votes.reduce((sum, vote) => sum + vote, 0);
+      return Math.round(totalVotes / votes[votingId].votes.length);
     }
-  
-    const totalVotes = votes[votingId].votes.reduce((sum, vote) => sum + vote, 0);
-    return Math.round(totalVotes / votes[votingId].votes.length);
-  }
-  
-  function saveVotesToStorage() {
-    localStorage.setItem('karaoke_votes', JSON.stringify(votes));
-  }
-  
-  function loadVotesFromStorage() {
-    const savedVotes = localStorage.getItem('karaoke_votes');
-    if (savedVotes) {
-      votes = JSON.parse(savedVotes);
+
+    function saveVotesToStorage() {
+      localStorage.setItem('karaoke_votes', JSON.stringify(votes));
     }
-  }
-  
-  document.addEventListener('DOMContentLoaded', function () {
-    onYouTubeIframeAPIReady();
-    loadQueueFromStorage();
-    loadRounds();
-    loadVotesFromStorage();
-  });
+
+    function loadVotesFromStorage() {
+      const savedVotes = localStorage.getItem('karaoke_votes');
+      if (savedVotes) {
+        votes = JSON.parse(savedVotes);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      onYouTubeIframeAPIReady();
+      loadQueueFromStorage();
+      loadRounds();
+      loadVotesFromStorage();
+    });
   </script>
-  </body></html>
+</body>
+
+</html>
